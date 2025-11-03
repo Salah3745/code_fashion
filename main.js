@@ -45,6 +45,92 @@ document.addEventListener('DOMContentLoaded', () => {
         const langToggleBtn = document.getElementById('language-toggle');
         const body = document.body;
 
+        if (lang === 'en') {
+            // Switch to English
+            langToggleBtn.textContent = 'AR';
+            body.dir = 'ltr';
+            body.style.textAlign = 'left';
+
+            document.querySelector('.logo').textContent = 'HAMDY SOCKS';
+            document.querySelector('#home h2').textContent = 'Best Socks For You';
+            document.querySelector('#home p').textContent = 'Discover a collection of comfortable and stylish socks for all occasions';
+
+            document.querySelector('#products .section-title').textContent = 'Our Products';
+
+            const productTitles = [
+                'ADIDAS WHITE', 'ADIDAS BLACK', 'adidas colors', '2 lines adidas',
+                'nike colors (shorts)', 'nike colors', 'NBA', 'just do it (short)', 'chicken'
+            ];
+            const productDescriptions = [
+                'Comfortable and warm for daily use', 'Designed for sports and high performance', 'For special occasions and formal look',
+                'Perfect for the cold seasons', 'nike colors (shorts)', 'nike colors', 'NBA', 'just do it (short)', 'chicken'
+            ];
+
+            document.querySelectorAll('.product-card').forEach((card, index) => {
+                if (index < productTitles.length) {
+                    card.querySelector('.product-title').textContent = productTitles[index];
+                    card.querySelector('.product-description').textContent = productDescriptions[index];
+                }
+            });
+             document.querySelectorAll('.label .title').forEach(el => el.textContent = 'Add to Cart');
+             document.querySelectorAll('.label .title:last-child').forEach(el => el.textContent = 'Added');
+
+
+            document.querySelector('#about .section-title').textContent = 'About Us';
+            document.querySelector('.about-text').textContent = 'We specialize in providing the best types of socks that combine comfort, elegance, and quality. Whether you\'re looking for daily, sports, or even medical socks, we have something to suit every lifestyle.';
+
+            document.querySelector('.contact-title-wrapper h2').textContent = 'Contact Us';
+            document.querySelector('.contact-title-wrapper p').textContent = 'Have questions? Feel free to reach out';
+            
+            document.querySelector('.modal-content h2').textContent = 'Shopping Cart';
+            document.querySelector('.cart-total strong').textContent = 'Total:';
+            if (paymentTriggerBtn) paymentTriggerBtn.textContent = 'Proceed to Payment';
+            
+            updateDeliveryFormPlaceholders('en');
+
+
+        } else { // Switch to Arabic
+            langToggleBtn.textContent = 'EN';
+            body.dir = 'rtl';
+            body.style.textAlign = 'right';
+
+            document.querySelector('.logo').textContent = 'HAMDY SOCKS';
+            document.querySelector('#home h2').textContent = 'أفضل الشرابات لكم';
+            document.querySelector('#home p').textContent = 'اكتشف مجموعة من الشرابات المريحة والأنيقة لكل المناسبات';
+
+            document.querySelector('#products .section-title').textContent = 'منتجاتنا';
+
+            const productTitles = [
+                'ADIDAS WHITE', 'ADIDAS BLACK', 'adidas colors', '2 lines adidas',
+                'nike colors (shorts)', 'nike colors', 'NBA', 'just do it (short)', 'chicken'
+            ];
+            const productDescriptions = [
+                'مريحة ودافئة للاستخدام اليومي', 'مصممة للرياضة والأداء العالي', 'للمناسبات الخاصة والإطلالة الرسمية',
+                'مثالية للفصول الباردة', 'nike colors (shorts)', 'nike colors', 'NBA', 'just do it (short)', 'chicken'
+            ];
+
+            document.querySelectorAll('.product-card').forEach((card, index) => {
+                 if (index < productTitles.length) {
+                    card.querySelector('.product-title').textContent = productTitles[index];
+                    card.querySelector('.product-description').textContent = productDescriptions[index];
+                }
+            });
+            document.querySelectorAll('.label .title').forEach(el => el.textContent = 'أضف للسلة');
+            document.querySelectorAll('.label .title:last-child').forEach(el => el.textContent = 'تم الاضافة');
+
+            document.querySelector('#about .section-title').textContent = 'عنا';
+            document.querySelector('.about-text').textContent = 'نحن متخصصون في تقديم أفضل أنواع الشرابات التي تجمع بين الراحة، الأناقة، والجودة. سواء كنت تبحث عن شرابات يومية أو رياضية أو حتى طبية، لدينا ما يناسب كل أسلوب حياة.';
+
+            document.querySelector('.contact-title-wrapper h2').textContent = 'Contact Us';
+            document.querySelector('.contact-title-wrapper p').textContent = 'Have questions? Feel free to reach out';
+            
+            document.querySelector('.modal-content h2').textContent = 'عربة التسوق';
+            document.querySelector('.cart-total strong').textContent = 'الإجمالي:';
+            if (paymentTriggerBtn) paymentTriggerBtn.textContent = 'الانتقال للدفع';
+            
+            updateDeliveryFormPlaceholders('ar');
+        }
+        updateCartDisplay();
     }
 
 
@@ -287,7 +373,7 @@ ${orderDetailsString}
 
         // 6. رقم الهاتف (تأكد من صحته وخلوه من المسافات أو الرموز)
         // استخدام الرقم من اللينك الذي قدمته: 2001554728811
-        const phoneNumber = '201016298335'; 
+        const phoneNumber = '2001554728811'; 
 
         // 7. بناء الرابط النهائي
         const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
