@@ -1,7 +1,7 @@
 /* Variables (optional but good practice) */
 :root {
-  --primary-color: #8de010; /* Indigo-600 */
-  --secondary-color: #19d613; /* Indigo-400 */
+  --primary-color: #1a6418; /* Indigo-600 */
+  --secondary-color: #1a6418; /* Indigo-400 */
   --accent-color: #f6e05e; /* Yellow-400 */
   --text-color: #2d3748; /* Gray-800 */
   --light-text-color: #4a5568; /* Gray-700 */
@@ -1359,5 +1359,6 @@ body.dark-mode .label .title {
     font-size: 12px;
     font-weight: bold;
 }
+
 
 /* ... باقي الكود ... */
