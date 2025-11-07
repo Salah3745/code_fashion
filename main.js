@@ -158,7 +158,7 @@ ${orderDetailsString}
         `;
 
         const encodedMessage = encodeURIComponent(whatsappMessage);
-        const phoneNumber = '201016298335';
+        const phoneNumber = '201017925907';
         const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
         window.open(whatsappLink, '_blank');
         alert(`تم إرسال طلبك إلى واتساب لتأكيده. يرجى إكمال الخطوات هناك.\nتكلفة التوصيل: ${currentDeliveryCost} ج.م`);
@@ -268,3 +268,4 @@ ${orderDetailsString}
     // --- Initial Setup ---
     updateCartDisplay();
 });
+
