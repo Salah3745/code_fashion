@@ -6,7 +6,9 @@
   --text-color: #2d3748; /* Gray-800 */
   --light-text-color: #4a5568; /* Gray-700 */
   --white-color: #e7efcf; /* White */
-  
+  --dark-background: #1a202c; /* Dark Gray-900 */
+  --dark-header-background: #2d3748; /* Dark Gray-800 */
+  --dark-card-background: #2d3748; /* Dark Gray-800 */
   --hover-color: #3b3a9c; /* Darker Indigo */
   --button-hover-color: #ecc94b; /* Darker Yellow */
 }
@@ -22,6 +24,7 @@ body {
   color: var(--text-color); /* default text color */
   transition: background-color 0.3s ease, color 0.3s ease; /* Transition for dark mode */
 }
+
 
 
 /* Modal Styles */
@@ -123,6 +126,47 @@ body {
 .close-button:hover,
 .close-button:focus {
   color: #f44336; /* Red on hover */
+}
+
+/* Dark Mode adjustments for Modal */
+body.dark-mode .modal-content {
+  background-color: var(--dark-header-background);
+  color: #e2e8f0;
+}
+
+body.dark-mode .modal-content h2 {
+  color: var(--primary-color); /* light purple for logo */
+}
+
+body.dark-mode .cart-items-list li {
+  color: #cbd5e0;
+  border-bottom-color: #4a5568;
+}
+
+body.dark-mode .cart-total {
+  color: #e2e8f0;
+}
+
+body.dark-mode .cart-total span {
+  color: #68d391; /* lighter green */
+}
+
+body.dark-mode .payment-trigger-btn {
+  background-color: var(--primary-color);
+  color: var(--white-color);
+}
+
+body.dark-mode .payment-trigger-btn:hover {
+  background-color: var(--hover-color);
+}
+
+body.dark-mode .close-button {
+  color: #cbd5e0;
+}
+
+body.dark-mode .close-button:hover,
+body.dark-mode .close-button:focus {
+  color: #fc8181;
 }
 
 
@@ -401,6 +445,8 @@ header .container {
 
 
 
+
+
 /* Responsive adjustments for contact section */
 @media (max-width: 992px) { /* Apply adjustments for medium screens too */
   .hero h2 {
@@ -430,15 +476,7 @@ header .container {
   .contact-form {
     max-width: 100%; /* Form takes full width when stacked */
   }
-  .social-icons-container {
-    margin-top: 2rem; /* Add space between form and icons when stacked */
-    width: 180px; /* Slightly smaller circle on small screens */
-    height: 180px;
-  }
-  /* Adjust icon positioning for smaller screens if needed */
-  /* The 'translate' value might need to be smaller */
  
-
 
 /* Cart Button Styles */
 .cart-btn {
@@ -458,12 +496,9 @@ header .container {
 .cart-btn:hover {
   background-color: #edf2f7; /* خلفية عند المرور */
 }
-body.dark-mode .cart-btn {
-  color: var(--accent-color); /* لون أصفر في الوضع الليلي */
-}
-body.dark-mode .cart-btn:hover {
-  background-color: #4a5568;
-}
+anguage Toggle Button Styles */
+
+
 
 
 
@@ -541,7 +576,10 @@ body.dark-mode .cart-btn:hover {
     }
     
     /* Adjust button positioning in header */
-    
+    .language-btn, .dark-mode-btn {
+      margin-left: 0.5rem; /* Adjust spacing */
+      order: 3; /* Place these buttons after menu icon */
+    }
 }
 
 /* Optional: Styling for when menu is active (bars transform to X) */
@@ -654,6 +692,10 @@ body.dark-mode .cart-btn:hover {
     margin-left: 10px; /* Add some space if it's next to the quantity selector */
 }
 
+/* Styling for Dark Mode Menu Icon Bars */
+body.dark-mode .menu-icon .bar {
+  background-color: var(--accent-color); /* Yellow bars in dark mode */
+}
 
 /* Adjustments for the contact section map if you add one */
 .contact-container iframe {
@@ -682,6 +724,40 @@ body.dark-mode .cart-btn:hover {
   padding: 20px;
 }
 
+.payment--options {
+  width: calc(100% - 40px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Changed to 3 equal columns */
+  gap: 20px;
+  padding: 10px;
+  justify-items: center; /* Center items in their grid cells */
+  align-items: center; /* Center items vertically */
+}
+
+.payment--options button {
+  height: 55px;
+  background: #F2F2F2;
+  border-radius: 11px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+.payment--options button:hover {
+  background-color: #e0e0e0; /* Slight hover effect */
+}
+
+.payment--options button svg {
+  height: 18px;
+}
+
+.payment--options button:last-child svg {
+  height: 22px;
+}
 
 .separator {
   width: calc(100% - 20px);
@@ -710,7 +786,11 @@ body.dark-mode .cart-btn:hover {
   margin: auto;
 }
 
-
+.credit-card-info--form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
 
 .input_container {
   width: 100%;
@@ -881,6 +961,7 @@ button:active {
 }
 
 
+
 /* Adjustments for the add to cart button label when quantity is shown */
 .label:has(.input:checked) {
   width: 100px; /* تقليل العرض للسماح بظهور الـ quantity-selector */
@@ -904,6 +985,7 @@ button:active {
 }
 
 
+/* ... (الكود السابق) ... */
 
 .label .title {
   font-size: 17px;
@@ -922,7 +1004,9 @@ button:active {
     color: #000000; /* أو أي لون تفضله للخلفية الفاتحة */
 }
 
-lor: #fff;
+/* لون الكتابة في الوضع المظلم (اللي كان موجود قبل كده) */
+body.dark-mode .label .title {
+  color: #fff;
 }
 /* ستايل الدائرة الزرقاء الثابتة */
 .floating-cart-button-svg {
