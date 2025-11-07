@@ -1360,5 +1360,9 @@ body.dark-mode .label .title {
     font-weight: bold;
 }
 
-
+.social {
+    display: flex;
+    justify-content: space-between;
+}
 /* ... باقي الكود ... */
+
