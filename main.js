@@ -1,13 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Variables ---
-    const cartButton = document.getElementById('cart-button'); // Button in header
-    const floatingCartButton = document.getElementById('floating-cart-button'); // Floating button
+    const cartButton = document.getElementById('cart-button'); 
+    const floatingCartButton = document.getElementById('floating-cart-button'); 
     const cartModal = document.getElementById('cart-modal');
     const closeModalButton = document.getElementById('close-modal');
     const cartItemsList = document.getElementById('cart-items-list');
     const cartTotalPrice = document.getElementById('cart-total-price');
     const cartItemCountFloating = floatingCartButton ? floatingCartButton.querySelector('.cart-item-count-svg') : null;
-    const addToCartButtons = document.querySelectorAll('.add-to-cart');
     const paymentTriggerBtn = document.querySelector('.payment-trigger-btn');
     const finalCheckoutBtn = document.getElementById('final-checkout-btn');
 
@@ -21,14 +20,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputAddress = document.getElementById('address');
     const inputDeliveryTime = document.getElementById('delivery_time');
 
-    let cart = []; // Array to store cart items
+    let cart = []; 
 
     // --- Delivery Cost Variables ---
     const deliveryCostEgyptMadaeen = 25;
     const deliveryCostOtherLocations = 40;
 
     // --- Functions ---
-
     function addToCart(productId, productName, productPrice) {
         const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
         if (!productCard) return;
@@ -40,15 +38,23 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const existingItemIndex = cart.findIndex(item => item.id === productId);
+        // قراءة المقاس
+        const sizeSelect = productCard.querySelector('.size-select');
+        const selectedSize = sizeSelect ? sizeSelect.value : null;
+        if (!selectedSize) {
+            alert("من فضلك اختار المقاس");
+            return;
+        }
+
+        const existingItemIndex = cart.findIndex(item => item.id === productId && item.size === selectedSize);
         if (existingItemIndex > -1) {
             cart[existingItemIndex].quantity = quantity;
         } else {
-            cart.push({ id: productId, name: productName, price: productPrice, quantity: quantity });
+            cart.push({ id: productId, name: productName, price: productPrice, quantity: quantity, size: selectedSize });
         }
 
         updateCartDisplay();
-        alert(`تمت إضافة ${productName} (الكمية: ${quantity}) إلى السلة!`);
+        alert(`تمت إضافة ${productName} (المقاس: ${selectedSize}, الكمية: ${quantity}) إلى السلة!`);
     }
 
     function updateQuantity(productId, change) {
@@ -61,7 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (newQuantity >= 1) {
             quantityInput.value = newQuantity;
-            const itemIndex = cart.findIndex(item => item.id === productId);
+
+            // تحديث الكمية لجميع العناصر بالمقاس المختار
+            const sizeSelect = productCard.querySelector('.size-select');
+            const selectedSize = sizeSelect ? sizeSelect.value : null;
+            const itemIndex = cart.findIndex(item => item.id === productId && item.size === selectedSize);
             if (itemIndex > -1) {
                 cart[itemIndex].quantity = newQuantity;
                 updateCartDisplay();
@@ -69,8 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function removeItemFromCart(productId) {
-        cart = cart.filter(item => item.id !== productId);
+    function removeItemFromCart(productId, size) {
+        cart = cart.filter(item => !(item.id === productId && item.size === size));
         const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
         if (productCard) {
             const quantityInput = productCard.querySelector('.quantity-input');
@@ -124,8 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let totalOrderPrice = 0;
 
         cart.forEach(item => {
-            orderDetailsString += `- ${item.name} (الكمية: ${item.quantity}) - السعر: ${item.price.toFixed(2)} ج.م\n`;
-            totalOrderPrice += item.price * item.quantity;
+           orderDetailsString += `- ${item.name} | المقاس: ${item.size} | الكمية: ${item.quantity} | السعر: ${item.price.toFixed(2)} ج.م\n`;
+           totalOrderPrice += item.price * item.quantity;
         });
 
         if (!inputFullName.value.trim() || !inputPhoneNumber.value.trim() || !inputAddress.value.trim()) {
@@ -173,28 +183,23 @@ ${orderDetailsString}
         if (cart.length === 0) {
             cartItemsList.innerHTML = `<li>عربة التسوق فارغة.</li>`;
             cartTotalPrice.textContent = `0.00 ج.م`;
-            if(paymentTriggerBtn) paymentTriggerBtn.style.display = 'block';
-            if(cartItemsSection) cartItemsSection.style.display = 'block';
-            if(paymentFormContainer) paymentFormContainer.style.display = 'none';
         } else {
             cart.forEach(item => {
                 const listItem = document.createElement('li');
                 const itemTotal = item.price * item.quantity;
                 listItem.innerHTML = `
-                    <span>${item.name}</span>
+                    <span>${item.name} | المقاس: ${item.size}</span>
                     <span>${item.quantity} x ${item.price.toFixed(2)} ج.م</span>
                     <span>${itemTotal.toFixed(2)} ج.م</span>
-                    <button class="remove-item-btn" data-id="${item.id}">إزالة</button>
+                    <button class="remove-item-btn" data-id="${item.id}" data-size="${item.size}">إزالة</button>
                 `;
                 cartItemsList.appendChild(listItem);
                 total += itemTotal;
                 totalItems += item.quantity;
             });
             cartTotalPrice.textContent = `${total.toFixed(2)} ج.م`;
-            if(paymentTriggerBtn) paymentTriggerBtn.style.display = 'block';
-            if(cartItemsSection) cartItemsSection.style.display = 'block';
-            if(paymentFormContainer) paymentFormContainer.style.display = 'none';
         }
+
         if (cartItemCountFloating) {
             if (totalItems > 0) {
                 cartItemCountFloating.textContent = totalItems;
@@ -222,9 +227,12 @@ ${orderDetailsString}
                 const isChecked = e.target.checked;
                 const productName = card.querySelector('.product-title').textContent;
                 const productPrice = parseFloat(card.querySelector('.product-price').textContent.replace(/[^0-9.-]+/g, ""));
+                const sizeSelect = card.querySelector('.size-select');
+                const selectedSize = sizeSelect ? sizeSelect.value : null;
+
                 if (productId && productName && !isNaN(productPrice)) {
                     if (isChecked) addToCart(productId, productName, productPrice);
-                    else removeItemFromCart(productId);
+                    else removeItemFromCart(productId, selectedSize);
                 } else e.target.checked = !isChecked;
             });
         }
@@ -235,7 +243,8 @@ ${orderDetailsString}
     cartItemsList.addEventListener('click', (e) => {
         if (e.target.classList.contains('remove-item-btn')) {
             const productIdToRemove = e.target.dataset.id;
-            removeItemFromCart(productIdToRemove);
+            const sizeToRemove = e.target.dataset.size;
+            removeItemFromCart(productIdToRemove, sizeToRemove);
         }
     });
 
@@ -268,4 +277,3 @@ ${orderDetailsString}
     // --- Initial Setup ---
     updateCartDisplay();
 });
-
