@@ -14,47 +14,85 @@ document.addEventListener('DOMContentLoaded', () => {
     const deliveryForm = document.getElementById('delivery-form');
     const paymentFormContainer = document.querySelector('.payment-form-container');
     const cartItemsSection = document.getElementById('cart-items-section');
-    const paymentOptionsButtons = document.querySelectorAll('.payment--options button');
+    // const paymentOptionsButtons = document.querySelectorAll('.payment--options button'); // تم إزالتها لعدم وجودها في HTML
     const inputFullName = document.getElementById('full_name');
     const inputPhoneNumber = document.getElementById('phone_number');
     const inputAddress = document.getElementById('address');
     const inputDeliveryTime = document.getElementById('delivery_time');
 
-    let cart = []; 
+    let cart = []; // Array to hold cart items
 
     // --- Delivery Cost Variables ---
     const deliveryCostEgyptMadaeen = 25;
     const deliveryCostOtherLocations = 40;
 
-    // --- Functions ---
-    function addToCart(productId, productName, productPrice) {
+    // --- Helper Functions ---
+    
+    /**
+     * يحصل على المقاس المختار حالياً من داخل كرت المنتج.
+     * تم تعديل هذه الدالة للبحث عن زر Radio Button المختار.
+     */
+    function getSelectedSize(productCard) {
+        const sizeRadios = productCard.querySelectorAll('.sizes input[type="radio"]');
+        let selectedSize = null;
+        sizeRadios.forEach(radio => {
+            if (radio.checked) {
+                selectedSize = radio.value;
+            }
+        });
+        return selectedSize;
+    }
+
+    /**
+     * يجد عنصر التحقق (checkbox) المقابل للمنتج والمقاس المختار
+     */
+    function getCheckboxByProductAndSize(productId, size) {
+        // بما أن كود HTML لا يدعم ربط checkbox بمقاس معين بشكل مباشر، سنعتمد على productId فقط
+        // وهذا قد يسبب مشاكل في حالة تعدد المقاسات في نفس السلة لنفس المنتج
+        // (لكن مع التصميم الحالي لزر الإضافة للسلة، يجب أن يُستخدم checkbox واحد لكل منتج)
+        return document.querySelector(`.product-card[data-id="${productId}"] .input.add-to-cart`);
+    }
+
+    // --- Main Cart Functions ---
+    
+    function addToCart(productId, productName, productPrice, isChecked) {
         const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
         if (!productCard) return;
 
         const quantityInput = productCard.querySelector('.quantity-input');
-        const quantity = parseInt(quantityInput.value);
-        if (isNaN(quantity) || quantity < 1) {
-            alert('يرجى تحديد كمية صحيحة.');
-            return;
-        }
+        const quantity = parseInt(quantityInput.value) || 1;
+        
+        // **الإصلاح الرئيسي 1: استخدام getSelectedSize بدلاً من sizeSelect**
+        const selectedSize = getSelectedSize(productCard);
 
-        // قراءة المقاس
-        const sizeSelect = productCard.querySelector('.size-select');
-        const selectedSize = sizeSelect ? sizeSelect.value : null;
-        if (!selectedSize) {
-            alert("من فضلك اختار المقاس");
+        if (!selectedSize && isChecked) {
+            // تنبيه المستخدم إذا حاول الإضافة دون اختيار مقاس (فقط إذا كان يحاول الإضافة - isChecked)
+            alert("من فضلك اختار المقاس أولاً.");
+            const checkbox = productCard.querySelector('.input.add-to-cart');
+            if (checkbox) checkbox.checked = false; // إلغاء تحديد الـ checkbox
             return;
         }
 
         const existingItemIndex = cart.findIndex(item => item.id === productId && item.size === selectedSize);
-        if (existingItemIndex > -1) {
-            cart[existingItemIndex].quantity = quantity;
+        
+        if (isChecked) {
+            // منطق الإضافة/التحديث
+            if (existingItemIndex > -1) {
+                // إذا كان موجوداً، قم بتحديث الكمية (حسب قيمة حقل الكمية في البطاقة)
+                cart[existingItemIndex].quantity = quantity;
+            } else {
+                // إذا لم يكن موجوداً، قم بالإضافة
+                cart.push({ id: productId, name: productName, price: productPrice, quantity: quantity, size: selectedSize });
+                // alert(`تمت إضافة ${productName} (المقاس: ${selectedSize}, الكمية: ${quantity}) إلى السلة!`); // إزالة التنبيه المتكرر
+            }
         } else {
-            cart.push({ id: productId, name: productName, price: productPrice, quantity: quantity, size: selectedSize });
+            // منطق الإزالة (هذا يجب أن يتم عبر دالة removeItemFromCart)
+            if (existingItemIndex > -1) {
+                 removeItemFromCart(productId, selectedSize, false); // يتم التحديث داخل الدالة
+            }
         }
 
         updateCartDisplay();
-        alert(`تمت إضافة ${productName} (المقاس: ${selectedSize}, الكمية: ${quantity}) إلى السلة!`);
     }
 
     function updateQuantity(productId, change) {
@@ -68,10 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newQuantity >= 1) {
             quantityInput.value = newQuantity;
 
-            // تحديث الكمية لجميع العناصر بالمقاس المختار
-            const sizeSelect = productCard.querySelector('.size-select');
-            const selectedSize = sizeSelect ? sizeSelect.value : null;
+            // **الإصلاح الرئيسي 2: تحديث كمية المنتج في السلة بناءً على المقاس المختار**
+            const selectedSize = getSelectedSize(productCard);
             const itemIndex = cart.findIndex(item => item.id === productId && item.size === selectedSize);
+            
+            // تحديث الكمية في السلة فقط إذا كان المنتج والمقاس محددين وموجودين في السلة
             if (itemIndex > -1) {
                 cart[itemIndex].quantity = newQuantity;
                 updateCartDisplay();
@@ -79,15 +118,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function removeItemFromCart(productId, size) {
+    function removeItemFromCart(productId, size, updateCheckbox = true) {
+        // إزالة العنصر من مصفوفة السلة
         cart = cart.filter(item => !(item.id === productId && item.size === size));
-        const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
-        if (productCard) {
-            const quantityInput = productCard.querySelector('.quantity-input');
-            if (quantityInput) quantityInput.value = 1;
-            const checkbox = productCard.querySelector('.input.add-to-cart');
-            if (checkbox) checkbox.checked = false;
+        
+        // **الإصلاح الرئيسي 3: إعادة تعيين حالة الـ checkbox على المنتج**
+        if (updateCheckbox) {
+            const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
+            if (productCard) {
+                const checkbox = productCard.querySelector('.input.add-to-cart');
+                if (checkbox) checkbox.checked = false;
+
+                // إعادة تعيين الكمية في حقل الإدخال إلى 1
+                const quantityInput = productCard.querySelector('.quantity-input');
+                if (quantityInput) quantityInput.value = 1;
+
+                // **اختياري:** إعادة تعيين اختيار المقاس في البطاقة بعد الإزالة
+                const sizeRadios = productCard.querySelectorAll('.sizes input[type="radio"]');
+                sizeRadios.forEach(radio => radio.checked = false);
+            }
         }
+        
         updateCartDisplay();
     }
 
@@ -116,17 +167,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if(cartItemsSection) cartItemsSection.style.display = 'none';
         if(paymentFormContainer) paymentFormContainer.style.display = 'block';
-        resetDeliveryForm();
+        // لا حاجة لـ resetDeliveryForm هنا
     }
 
     function resetDeliveryForm() {
         if (deliveryForm) deliveryForm.reset();
-        paymentOptionsButtons.forEach(btn => btn.classList.remove('selected'));
+        // paymentOptionsButtons.forEach(btn => btn.classList.remove('selected')); // تم إزالتها
     }
 
-    function sendOrderViaWhatsApp() {
+    function sendOrderViaWhatsApp(e) {
+        e.preventDefault(); // منع الإرسال التقليدي للنموذج
+
         if (cart.length === 0) {
             alert('عربة التسوق فارغة!');
+            return;
+        }
+        
+        // التحقق من الحقول الإلزامية
+        if (!inputFullName.value.trim() || !inputPhoneNumber.value.trim() || !inputAddress.value.trim()) {
+            alert('يرجى ملء جميع حقول الاستلام الإلزامية (الاسم، الهاتف، العنوان).');
             return;
         }
 
@@ -138,14 +197,13 @@ document.addEventListener('DOMContentLoaded', () => {
            totalOrderPrice += item.price * item.quantity;
         });
 
-        if (!inputFullName.value.trim() || !inputPhoneNumber.value.trim() || !inputAddress.value.trim()) {
-            alert('يرجى ملء جميع حقول الاستلام الإلزامية (الاسم، الهاتف، العنوان).');
-            return;
-        }
-
         let currentDeliveryCost = 0;
         const lowerCaseAddress = inputAddress.value.trim().toLowerCase();
-        if (lowerCaseAddress.includes('المعادي') || lowerCaseAddress.includes('حدائق المعادي') || lowerCaseAddress.includes('دار السلام')) {
+        // **الإصلاح 4: إضافة مدن ومناطق أخرى شهيرة في نطاق التوصيل الرخيص**
+        const madaeenKeywords = ['المعادي', 'حدائق المعادي', 'دار السلام', 'دارالسلام', 'حلوان', 'طره', 'البساتين', 'المقطم'];
+        const isMadaeenArea = madaeenKeywords.some(keyword => lowerCaseAddress.includes(keyword));
+
+        if (isMadaeenArea) {
             currentDeliveryCost = deliveryCostEgyptMadaeen;
         } else {
             currentDeliveryCost = deliveryCostOtherLocations;
@@ -163,35 +221,49 @@ document.addEventListener('DOMContentLoaded', () => {
 المنتجات المطلوبة:
 ${orderDetailsString}
 --------------------
+مجموع أسعار المنتجات: ${totalOrderPrice.toFixed(2)} ج.م
 تكلفة التوصيل: ${currentDeliveryCost} ج.م
 الإجمالي النهائي: ${finalTotalPrice.toFixed(2)} ج.م
         `;
 
         const encodedMessage = encodeURIComponent(whatsappMessage);
-        const phoneNumber = '201017925907';
+        const phoneNumber = '201017925907'; // رقم الواتساب الخاص بك
         const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+        
+        // فتح رابط الواتساب
         window.open(whatsappLink, '_blank');
-        alert(`تم إرسال طلبك إلى واتساب لتأكيده. يرجى إكمال الخطوات هناك.\nتكلفة التوصيل: ${currentDeliveryCost} ج.م`);
+        
+        // إغلاق المودال بعد الإرسال
+        closeCartModal();
+        
+        // **اختياري:** تفريغ السلة بعد إتمام الطلب (يفضل بعد تأكيد العميل على الواتساب، ولكن لتنظيف الواجهة الآن)
+        // cart = [];
+        // updateCartDisplay();
+        // resetAllProductCards(); // دالة جديدة لإعادة تعيين جميع البطاقات
     }
 
     function updateCartDisplay() {
         cartItemsList.innerHTML = '';
         let total = 0;
         let totalItems = 0;
-        cart.sort((a, b) => a.id.localeCompare(b.id));
+        cart.sort((a, b) => a.id.localeCompare(b.id) || a.size.localeCompare(b.size)); // ترتيب حسب المنتج ثم المقاس
 
         if (cart.length === 0) {
-            cartItemsList.innerHTML = `<li>عربة التسوق فارغة.</li>`;
+            cartItemsList.innerHTML = `<li style="text-align: center; color: var(--light-text-color);">عربة التسوق فارغة.</li>`;
             cartTotalPrice.textContent = `0.00 ج.م`;
         } else {
             cart.forEach(item => {
                 const listItem = document.createElement('li');
                 const itemTotal = item.price * item.quantity;
                 listItem.innerHTML = `
-                    <span>${item.name} | المقاس: ${item.size}</span>
-                    <span>${item.quantity} x ${item.price.toFixed(2)} ج.م</span>
-                    <span>${itemTotal.toFixed(2)} ج.م</span>
-                    <button class="remove-item-btn" data-id="${item.id}" data-size="${item.size}">إزالة</button>
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px;">
+                        <strong>${item.name}</strong> 
+                        <span>المقاس: ${item.size} | الكمية: ${item.quantity}</span>
+                    </div>
+                    <div style="text-align: left; color: #38a169;">
+                        ${itemTotal.toFixed(2)} ج.م
+                    </div>
+                    <button class="remove-item-btn btn" data-id="${item.id}" data-size="${item.size}" style="background-color: #f44336; color: white; padding: 5px 10px; font-size: 0.9rem;">إزالة</button>
                 `;
                 cartItemsList.appendChild(listItem);
                 total += itemTotal;
@@ -223,23 +295,44 @@ ${orderDetailsString}
         const plusBtn = card.querySelector('.plus-btn');
 
         if (addToCartCheckbox) {
+            // **الإصلاح 5: تمرير حالة الـ checkbox إلى addToCart**
             addToCartCheckbox.addEventListener('change', (e) => {
                 const isChecked = e.target.checked;
                 const productName = card.querySelector('.product-title').textContent;
-                const productPrice = parseFloat(card.querySelector('.product-price').textContent.replace(/[^0-9.-]+/g, ""));
-                const sizeSelect = card.querySelector('.size-select');
-                const selectedSize = sizeSelect ? sizeSelect.value : null;
+                const productPriceText = card.querySelector('.product-price').textContent.replace(/[^0-9.]+/g, "").trim();
+                const productPrice = parseFloat(productPriceText);
 
                 if (productId && productName && !isNaN(productPrice)) {
-                    if (isChecked) addToCart(productId, productName, productPrice);
-                    else removeItemFromCart(productId, selectedSize);
-                } else e.target.checked = !isChecked;
+                    // دالة addToCart ستتحقق من المقاس وتنفذ الإضافة أو تلغي التحديد
+                    addToCart(productId, productName, productPrice, isChecked);
+                } else {
+                    e.target.checked = !isChecked; // إرجاع الحالة إذا كانت البيانات غير سليمة
+                }
             });
         }
+        
+        // **الإصلاح 6: عند تغيير الكمية، لا نحتاج لتغيير حالة الـ checkbox**
         if (minusBtn) minusBtn.addEventListener('click', () => updateQuantity(productId, -1));
         if (plusBtn) plusBtn.addEventListener('click', () => updateQuantity(productId, 1));
+        
+        // **الإصلاح 7: إضافة مستمعي حدث لأزرار المقاسات**
+        card.querySelectorAll('.sizes input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                // إذا تم تحديد مقاس جديد، وتحقق الـ checkbox بالفعل (أي المنتج في السلة)
+                if (addToCartCheckbox.checked) {
+                    const productName = card.querySelector('.product-title').textContent;
+                    const productPriceText = card.querySelector('.product-price').textContent.replace(/[^0-9.]+/g, "").trim();
+                    const productPrice = parseFloat(productPriceText);
+                    
+                    // تحديث الكمية في السلة للعنصر الجديد (بالمقاس الجديد)
+                    // بما أننا لا نعرف ما إذا كان المقاس السابق موجوداً في السلة، نعتمد على المنطق داخل addToCart
+                    addToCart(productId, productName, productPrice, true);
+                }
+            });
+        });
     });
-
+    
+    // **الإصلاح 8: إزالة العنصر من السلة داخل المودال**
     cartItemsList.addEventListener('click', (e) => {
         if (e.target.classList.contains('remove-item-btn')) {
             const productIdToRemove = e.target.dataset.id;
@@ -249,14 +342,8 @@ ${orderDetailsString}
     });
 
     if (paymentTriggerBtn) paymentTriggerBtn.addEventListener('click', showDeliveryForm);
+    // **الإصلاح 9: استخدام addEventListener بشكل صحيح مع finalCheckoutBtn**
     if (finalCheckoutBtn) finalCheckoutBtn.addEventListener('click', sendOrderViaWhatsApp);
-
-    paymentOptionsButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            paymentOptionsButtons.forEach(btn => btn.classList.remove('selected'));
-            button.classList.add('selected');
-        });
-    });
 
     // --- Mobile Menu Toggle ---
     const menuIcon = document.getElementById('menu-icon');
@@ -268,8 +355,11 @@ ${orderDetailsString}
         });
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                menuIcon.classList.remove('active');
+                // تأخير بسيط لضمان تنفيذ الانتقال قبل إخفاء القائمة
+                setTimeout(() => {
+                    navLinks.classList.remove('active');
+                    menuIcon.classList.remove('active');
+                }, 150);
             });
         });
     }
