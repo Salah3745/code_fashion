@@ -7,6 +7,7 @@
   --white-color: #e7efcf;
   --hover-color: #3b3a9c;
   --button-hover-color: #ecc94b;
+  --dark-green: #0e460c; /* لون أخضر داكن جديد */
 }
 
 body {
@@ -25,23 +26,72 @@ body {
   margin: 0 auto;
   padding: 0 1rem;
   box-sizing: border-box;
-  position: sticky;
-  z-index: 1000;
 }
 
 header {
   background-color: var(--white-color);
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
   padding: 0.5rem 0;
+  position: sticky; /* لجعل الهيدر ثابت */
+  top: 0;
+  z-index: 1000;
 }
 header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
 .logo { font-size: 2.25rem; font-weight: 700; color: var(--primary-color); }
-.nav-links { display: flex; list-style: none; gap: 1.5rem; }
+.nav-links { display: flex; list-style: none; gap: 1.5rem; margin: 0; padding: 0; }
 .nav-links a { color: var(--light-text-color); text-decoration: none; transition: color 0.3s ease; }
 .nav-links a:hover { color: var(--primary-color); }
 
+/* Cart Button in Header */
+.cart-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: var(--primary-color);
+    transition: color 0.3s ease;
+    z-index: 1010; /* فوق القائمة */
+}
+.cart-btn svg {
+    stroke: var(--primary-color);
+    width: 30px;
+    height: 30px;
+}
+.cart-btn:hover svg {
+    stroke: var(--hover-color);
+}
+
+/* Menu Icon for Mobile - New CSS */
+.menu-icon {
+    display: none; /* Hide by default on desktop */
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    cursor: pointer;
+    z-index: 1010;
+}
+.bar {
+    height: 3px;
+    width: 100%;
+    background-color: var(--primary-color);
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+/* Menu Icon Animation */
+.menu-icon.active .bar:nth-child(2) {
+    opacity: 0;
+}
+.menu-icon.active .bar:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+.menu-icon.active .bar:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+/* End Menu Icon CSS */
+
 /* Hero */
-.hero { background: linear-gradient(135deg, var(--secondary-color) 0%, #764ba2 100%); color: var(--white-color); padding: 5rem 1rem; text-align: center; }
+.hero { background: linear-gradient(135deg, var(--secondary-color) 0%, var(--dark-green) 100%); color: var(--white-color); padding: 5rem 1rem; text-align: center; }
 .hero h2 { font-size: 3.75rem; font-weight: 700; margin-bottom: 1rem; }
 .hero p { font-size: 1.25rem; margin-bottom: 2rem; }
 .btn { background-color: var(--accent-color); color: #000; padding: 0.75rem 2rem; border-radius: 9999px; font-weight: 600; font-size: 1.125rem; text-decoration: none; border: none; cursor: pointer; transition: background-color 0.3s ease; }
@@ -52,55 +102,396 @@ header .container { display: flex; justify-content: space-between; align-items: 
 .section-title { font-size: 2.5rem; font-weight: 700; text-align: center; margin-bottom: 3rem; color: var(--text-color); }
 .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: 2rem; }
 .product-card { background-color: #f7fafc; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06); transition: transform 0.3s ease; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.product-card:hover { transform: translateY(-10px); }
+.product-card:hover { transform: translateY(-5px); }
 .product-card img { width: 100%; height: 16rem; object-fit: cover; border-radius: 0.375rem; margin-bottom: 1rem; }
 .product-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
 .product-description { color: var(--light-text-color); margin-bottom: 1rem; }
-.product-card .btn { background-color: var(--primary-color); color: var(--white-color); padding: 0.5rem 1.5rem; border-radius: 0.375rem; transition: background-color 0.3s ease; margin-top: auto; }
-.product-card .btn:hover { background-color: var(--hover-color); }
 .product-price { font-size: 1.125rem; font-weight: 700; color: #38a169; display: block; margin-top: 0.5rem; }
 
-/* About */
-.about-section { padding: 5rem 1rem; background-color: #edf2f7; text-align: center; }
-.about-text { font-size: 1.125rem; color: var(--light-text-color); max-width: 48rem; margin: 0 auto; }
+/* Product Sizes */
+.sizes {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+.sizes label {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid var(--light-text-color);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.sizes input[type="radio"] {
+    display: none;
+}
+.sizes input[type="radio"]:checked + label {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border-color: var(--primary-color);
+}
 
-/* Contact */
-.contact-section .container.contact-container { display: flex; flex-direction: column; align-items: center; gap: 2rem; max-width: 1200px; margin: 0 auto; padding: 3rem 1rem; }
-.contact-title-wrapper { width: 100%; max-width: 900px; text-align: center; }
-.contact-title-wrapper h2.section-title { font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-color); }
-.contact-title-wrapper p.contact-text { font-size: 1.125rem; color: var(--light-text-color); }
-.contact-content-wrapper { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 3rem; width: 100%; max-width: 900px; }
-.contact-form { flex:1; min-width:300px; max-width:500px; display:flex; flex-direction:column; gap:1rem; text-align:right; }
-.contact-form input, .contact-form textarea { width:100%; padding:0.8rem; border:1px solid #ccc; border-radius:5px; font-size:1rem; box-sizing:border-box; }
-.contact-form textarea { min-height:150px; resize:vertical; }
-.contact-form button { padding:0.8rem 1.5rem; background-color:var(--primary-color); color:white; border:none; border-radius:5px; cursor:pointer; align-self:flex-start; font-size:1rem; transition: background-color 0.3s ease; }
-.contact-form button:hover { background-color: var(--hover-color); }
+/* Custom Add to Cart Button CSS - New CSS */
+.container-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: auto; /* يدفع العناصر للأسفل */
+}
 
+.add-to-cart-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 5px;
+    width: 80%;
+    transition: background-color 0.3s ease;
+}
 
+.add-to-cart-label:hover {
+    background-color: var(--dark-green);
+}
+
+.input {
+    display: none; /* Hide the actual checkbox */
+}
+
+.circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid white;
+    margin-left: 10px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.square {
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 2px;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+.added-title {
+    display: none; /* Initially hide 'تم الاضافة' */
+}
+
+/* Checked State Styles */
+.input:checked + .circle {
+    background-color: white;
+    border-color: white;
+}
+
+.input:checked + .circle .square {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    transform: scale(0);
+}
+
+.input:checked + .circle {
+    /* Optional: transform the circle to look like a check mark holder */
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    
+}
+.input:checked + .circle::after {
+    content: '';
+    position: absolute;
+    width: 5px;
+    height: 10px;
+    border: solid var(--primary-color);
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+.input:checked ~ .default-title {
+    display: none;
+}
+
+.input:checked ~ .added-title {
+    display: block; /* Show 'تم الاضافة' when checked */
+}
+
+/* Quantity Selector CSS - New CSS */
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    border: 1px solid var(--light-text-color);
+    border-radius: 5px;
+    width: 80%;
+    max-width: 150px;
+}
+.quantity-btn {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    transition: background-color 0.2s;
+}
+.quantity-btn:hover {
+    background-color: #ddd;
+}
+.minus-btn {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.plus-btn {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+.quantity-input {
+    width: 40px;
+    text-align: center;
+    border: none;
+    outline: none;
+    padding: 0.4rem 0;
+    font-size: 1rem;
+    color: var(--text-color);
+    -moz-appearance: textfield; /* Firefox */
+}
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* End Quantity Selector CSS */
+
+/* Contact Section */
+.contact-section { padding: 3rem 1rem; background-color: #edf2f7; text-align: center; }
+.contact-container { display: flex; flex-direction: column; align-items: center; gap: 2rem; }
+.contact-content-wrapper { display: flex; justify-content: center; align-items: center; width: 100%; max-width: 900px; }
+.social {
+    display: flex;
+    gap: 15px;
+}
+.social img {
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+.social img:hover {
+    transform: scale(1.1);
+}
 
 /* Modal */
-.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); padding-top: 60px; transition: opacity 0.3s ease; }
-.modal-content { background-color: var(--white-color); margin: 5% auto; padding: 30px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); position: relative; text-align: right; direction: rtl; }
+.modal { display: none; position: fixed; z-index: 1020; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); padding-top: 60px; transition: opacity 0.3s ease; }
+.modal-content { 
+    background-color: var(--white-color); 
+    margin: 5% auto; 
+    padding: 30px; 
+    border-radius: 8px; 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
+    position: relative; 
+    text-align: right; 
+    direction: rtl; 
+    max-width: 600px; /* Added max-width for better desktop viewing */
+    width: 90%; 
+}
 .modal-content h2 { font-size: 2rem; margin-bottom: 20px; color: var(--primary-color); }
 .cart-items-list { list-style: none; padding: 0; margin-bottom: 20px; }
 .cart-items-list li { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; color: var(--light-text-color); }
 .cart-items-list li:last-child { border-bottom: none; }
 .cart-total { text-align: right; font-size: 1.25rem; margin: 20px 0; font-weight: 600; }
-.cart-total span { color: #38a169; }
-.payment-trigger-btn { background-color: var(--primary-color); color: var(--white-color); padding: 0.75rem 2rem; border-radius: 0.375rem; font-weight: 600; font-size: 1.125rem; transition: background-color 0.3s ease; width: 100%; margin-top: 15px; cursor: pointer; }
-.payment-trigger-btn:hover { background-color: var(--hover-color); }
+.cart-total span { color: var(--primary-color); }
+.payment-trigger-btn { 
+    background-color: var(--primary-color); 
+    color: var(--white-color); 
+    padding: 0.75rem 2rem; 
+    border-radius: 0.375rem; 
+    font-weight: 600; 
+    font-size: 1.125rem; 
+    transition: background-color 0.3s ease; 
+    width: 100%; 
+    margin-top: 15px; 
+    cursor: pointer; 
+    border: none;
+}
+.payment-trigger-btn:hover { background-color: var(--dark-green); }
 .close-button { position: absolute; top: 10px; left: 10px; color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
 .close-button:hover, .close-button:focus { color: #f44336; }
 
+
+/* Delivery Form CSS - New CSS */
+.payment-form-container {
+    display: none; /* Hidden by default, shown via JS */
+}
+.payment-form-container h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+.separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+}
+.separator .line {
+    flex-grow: 1;
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 0 10px;
+}
+.separator p {
+    color: var(--light-text-color);
+    font-size: 1rem;
+    white-space: nowrap;
+}
+.input_container {
+    margin-bottom: 15px;
+}
+.input_label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+.input_field {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+.input_field:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 5px rgba(26, 100, 24, 0.2);
+}
+.purchase--btn {
+    background-color: #38a169;
+    color: var(--white-color);
+    padding: 1rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+.purchase--btn:hover {
+    background-color: #2f855a;
+}
+/* End Delivery Form CSS */
+
+
+/* Floating Cart Button CSS - New CSS */
+.floating-cart-button-svg {
+    position: fixed;
+    bottom: 20px;
+    left: 20px; /* Positioned on the left for RTL, common for floating elements */
+    width: 60px;
+    height: 60px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1010;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.floating-cart-button-svg:hover {
+    background-color: var(--dark-green);
+    transform: scale(1.05);
+}
+.floating-cart-button-svg svg {
+    width: 30px;
+    height: 30px;
+    fill: var(--white-color); /* Fill the icon with white/light color */
+}
+.cart-item-count-svg {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #f44336; /* Red dot */
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+}
+/* End Floating Cart Button CSS */
+
+
 /* Responsive */
 @media (max-width: 768px) {
-  .hero h2 { font-size:2.5rem; } .hero p { font-size:1rem; }
+  /* Mobile Menu Toggles */
+  .menu-icon {
+    display: flex; /* Show hamburger menu icon on mobile */
+  }
+  .nav-links {
+    display: none; /* Hide navigation links by default on mobile */
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+    background-color: var(--white-color);
+    position: absolute;
+    top: 57px; /* Below the header/nav bar */
+    left: 0;
+    padding: 1rem 0;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    z-index: 999;
+  }
+  .nav-links.active {
+    display: flex; /* Show navigation links when active class is added by JS */
+  }
+  .nav-links li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+  }
+  .nav-links li:last-child {
+      border-bottom: none;
+  }
+  
+  /* General Mobile Adjustments */
+  .hero h2 { font-size:2.5rem; } 
+  .hero p { font-size:1rem; }
   .product-grid { grid-template-columns:1fr; }
   .contact-content-wrapper { flex-direction:column; align-items:center; }
   .contact-form { max-width:100%; }
-  .social-icons-container { width:180px;height:180px;margin-top:2rem; }
-  .social-icon-item.instagram-icon { transform: rotate(0deg) translate(70px) rotate(0deg); }
-  .social-icon-item.facebook-icon { transform: rotate(90deg) translate(70px) rotate(-90deg); }
-  .social-icon-item.whatsapp-icon { transform: rotate(180deg) translate(70px) rotate(-180deg); }
-  .social-icon-item.google-icon { transform: rotate(270deg) translate(70px) rotate(-270deg); }
+  .modal-content { 
+      margin: 10px auto; 
+      padding: 20px; 
+      width: 95%; 
+  }
+  .floating-cart-button-svg {
+      width: 50px;
+      height: 50px;
+  }
+  .cart-item-count-svg {
+      width: 18px;
+      height: 18px;
+      font-size: 0.7rem;
+  }
 }
