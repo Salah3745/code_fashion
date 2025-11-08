@@ -25,6 +25,99 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease; /* Transition for dark mode */
 }
 
+/* Dark Mode Styles */
+body.dark-mode {
+  background-color: var(--dark-background); /* dark gray background */
+  color: #e2e8f0; /* light gray text */
+}
+
+body.dark-mode header {
+  background-color: var(--dark-header-background); /* darker header */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .logo {
+  color: var(--primary-color); /* light purple for logo */
+}
+
+body.dark-mode .nav-links a {
+  color: #cbd5e0; /* lighter nav links */
+}
+
+body.dark-mode .nav-links a:hover {
+  color: var(--primary-color); /* hover purple */
+}
+
+body.dark-mode .hero {
+  background: linear-gradient(135deg, #4c51bf 0%, #6b46c1 100%); /* darker hero background */
+}
+
+body.dark-mode .section-title {
+  color: #e2e8f0; /* light gray title */
+}
+
+body.dark-mode .products-section {
+  background-color: var(--dark-background); /* dark products background */
+}
+
+body.dark-mode .product-card {
+  background-color: var(--dark-card-background); /* darker product card */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .product-title {
+  color: #e2e8f0;
+}
+
+body.dark-mode .product-description {
+  color: #cbd5e0;
+}
+
+body.dark-mode .product-card .btn {
+  background-color: var(--primary-color);
+  color: var(--white-color);
+}
+
+body.dark-mode .product-card .btn:hover {
+  background-color: var(--hover-color);
+}
+
+body.dark-mode .product-price {
+  color: #68d391; /* lighter green */
+}
+
+body.dark-mode .about-section {
+  background-color: var(--dark-header-background); /* darker about section */
+}
+
+body.dark-mode .about-text {
+  color: #cbd5e0;
+}
+
+/* Dark Mode adjustments for Contact Section */
+body.dark-mode .contact-form input,
+body.dark-mode .contact-form textarea {
+  background-color: #4a5568; /* darker input fields */
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+body.dark-mode .contact-form input::placeholder,
+body.dark-mode .contact-form textarea::placeholder {
+  color: #a0aec0; /* lighter placeholder text */
+}
+body.dark-mode .contact-form .btn {
+  background-color: var(--primary-color);
+  color: var(--white-color);
+}
+body.dark-mode .contact-form .btn:hover {
+  background-color: var(--hover-color);
+}
+
+/* Dark mode adjustments for social icons */
+body.dark-mode .social-icon-item {
+  background-color: #4a5568; /* Darker background for icons */
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 5px -1px, rgba(0, 0, 0, 0.4) 0px 1px 3px -1px;
+}
 
 
 /* Modal Styles */
@@ -341,22 +434,6 @@ header .container {
   display: block;
   margin-top: 0.5rem; /* mt-2 */
 }
-.sizes label {
-  border: 1px solid #ccc;
-  padding: 8px 14px;
-  border-radius: 6px;
-  margin-right: 8px;
-  cursor: pointer;
-  user-select: none;
-}
-.sizes input { display:none; }
-.sizes input:checked + span,
-.sizes input:checked ~ label {
-  background:#000;
-  color:#fff;
-  border-color:#000;
-}
-
 
 /* About Section */
 .about-section {
@@ -460,7 +537,82 @@ header .container {
 }
 
 
+/* Social Icons Container */
+.social-icons-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* Needed for positioning the circle */
+  width: 200px; /* Fixed size for the circle area */
+  height: 200px;
+  margin-top: 1rem; /* Space if it wraps below */
+}
 
+/* Container for the full circle effect */
+.social-icons-circle {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-style: preserve-3d; /* Enable 3D transforms */
+  border-radius: 50%; /* Make the container circular */
+  /* Animation removed as per previous decision, uncomment if you want rotation */
+  /* animation: rotateCircle 15s infinite linear; */
+}
+
+/* Individual social icon item styles */
+.social-icon-item {
+  position: absolute; /* Position items within the circle */
+  width: 70px; /* Size of the button/card */
+  height: 70px;
+  border: none;
+  border-radius: 50%; /* Make buttons circular */
+  background-color: var(--white-color); /* Default background */
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease, fill 0.3s ease;
+}
+
+/* Positioning the icons around the circle */
+/* These calculations are approximate and might need fine-tuning */
+/* The radius of the circle can be adjusted to space out the icons */
+.social-icon-item.instagram-icon { transform: rotate(0deg) translate(90px) rotate(0deg); }
+.social-icon-item.facebook-icon { transform: rotate(90deg) translate(90px) rotate(-90deg); }
+.social-icon-item.whatsapp-icon { transform: rotate(180deg) translate(90px) rotate(-180deg); }
+.social-icon-item.google-icon { transform: rotate(270deg) translate(90px) rotate(-270deg); }
+
+
+/* Icon colors and hover effects */
+.social-icon-item svg {
+  width: 30px;
+  height: 30px;
+  transition: fill 0.2s ease-in-out;
+}
+
+.instagram-icon svg { fill: #cc39a4; }
+.facebook-icon svg { fill: #03A9F4; }
+.whatsapp-icon svg { fill: #00ff00; }
+.google-icon svg { fill: #f14336; }
+
+.social-icon-item:hover {
+  transform: scale(1.1); /* Slightly larger on hover */
+}
+.instagram-icon:hover { background-color: #cc39a4; }
+.instagram-icon:hover svg { fill: white; }
+
+.facebook-icon:hover { background-color: #1877f2; }
+.facebook-icon:hover svg { fill: white; }
+
+.whatsapp-icon:hover { background-color: #00ff00; }
+.whatsapp-icon:hover svg { fill: white; }
+
+.google-icon:hover { background-color: #FF0004; }
+.google-icon:hover svg { fill: white; }
 
 
 /* Responsive adjustments for contact section */
@@ -492,7 +644,19 @@ header .container {
   .contact-form {
     max-width: 100%; /* Form takes full width when stacked */
   }
- 
+  .social-icons-container {
+    margin-top: 2rem; /* Add space between form and icons when stacked */
+    width: 180px; /* Slightly smaller circle on small screens */
+    height: 180px;
+  }
+  /* Adjust icon positioning for smaller screens if needed */
+  /* The 'translate' value might need to be smaller */
+  .social-icon-item.instagram-icon { transform: rotate(0deg) translate(70px) rotate(0deg); }
+  .social-icon-item.facebook-icon { transform: rotate(90deg) translate(70px) rotate(-90deg); }
+  .social-icon-item.whatsapp-icon { transform: rotate(180deg) translate(70px) rotate(-180deg); }
+  .social-icon-item.google-icon { transform: rotate(270deg) translate(70px) rotate(-270deg); }
+}
+
 
 /* Cart Button Styles */
 .cart-btn {
@@ -512,11 +676,72 @@ header .container {
 .cart-btn:hover {
   background-color: #edf2f7; /* خلفية عند المرور */
 }
-anguage Toggle Button Styles */
+body.dark-mode .cart-btn {
+  color: var(--accent-color); /* لون أصفر في الوضع الليلي */
+}
+body.dark-mode .cart-btn:hover {
+  background-color: #4a5568;
+}
 
+/* Language Toggle Button Styles */
+.language-btn {
+  background: none;
+  border: 1px solid var(--light-text-color);
+  color: var(--light-text-color);
+  padding: 0.3rem 0.8rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-weight: 600;
+  margin-left: 1rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 
+.language-btn:hover {
+  background-color: var(--light-text-color);
+  color: #fff;
+}
 
+body.dark-mode .language-btn {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
 
+body.dark-mode .language-btn:hover {
+  background-color: var(--accent-color);
+  color: var(--dark-background);
+}
+
+/* Styles for the Dark Mode Toggle Button */
+.dark-mode-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--light-text-color); /* Default color for the sun icon */
+  font-size: 1.5rem; /* Adjust size as needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode-btn:hover {
+  background-color: #edf2f7; /* bg-gray-200 */
+}
+
+body.dark-mode .dark-mode-btn {
+  color: var(--accent-color); /* Yellow for the moon icon in dark mode */
+}
+
+body.dark-mode .dark-mode-btn:hover {
+  background-color: #4a5568;
+}
+
+.dark-mode-btn svg {
+  width: 1.5rem; /* Equivalent to w-6 */
+  height: 1.5rem; /* Equivalent to h-6 */
+}
 
 /* Styles for the Menu Icon (Hamburger Menu) */
 .menu-icon {
@@ -880,7 +1105,51 @@ body.dark-mode .menu-icon .bar {
   -moz-appearance: textfield;
 }
 
+/* Dark Mode Adjustments for Payment Form */
+body.dark-mode .payment-form-container {
+  /* Background for the form itself in dark mode */
+}
 
+body.dark-mode .modal-content .form {
+  background-color: var(--dark-header-background); /* Match modal content background */
+  border-radius: 8px; /* Ensure rounding */
+}
+
+body.dark-mode .payment--options button {
+  background-color: #4a5568; /* Darker gray for payment options */
+  color: #e2e8f0; /* Lighter text */
+}
+body.dark-mode .payment--options button:hover {
+  background-color: #5a6778;
+}
+
+body.dark-mode .separator p {
+  color: #a0aec0; /* Lighter placeholder text */
+}
+body.dark-mode .separator .line {
+  background-color: #4a5568; /* Darker separator line */
+}
+
+body.dark-mode .input_label {
+  color: #a0aec0; /* Lighter label color */
+}
+
+body.dark-mode .input_field {
+  background-color: #4a5568; /* Darker input fields */
+  color: #e2e8f0; /* Lighter text in input fields */
+  border-color: #4a5568;
+}
+body.dark-mode .input_field:focus {
+  box-shadow: 0px 0px 0px 2px var(--accent-color); /* Accent color for focus in dark mode */
+}
+
+body.dark-mode .purchase--btn {
+  background: linear-gradient(180deg, #6b46c1 0%, #4c51bf 50%, #3b3a9c 100%); /* Darker gradient for purchase button */
+  box-shadow: none; /* Remove shadow for cleaner look */
+}
+body.dark-mode .purchase--btn:hover {
+   box-shadow: 0px 0px 0px 2px var(--accent-color), 0px 0px 0px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow on hover */
+}
 /* From Uiverse.io by adamgiebl */ 
 button {
   font-family: inherit;
@@ -976,7 +1245,18 @@ button:active {
   color: var(--text-color); /* لون النص */
 }
 
-
+/* Dark mode for quantity selector */
+body.dark-mode .quantity-btn {
+  background-color: var(--dark-header-background);
+}
+body.dark-mode .quantity-btn:hover {
+  background-color: var(--hover-color);
+}
+body.dark-mode .quantity-input {
+  background-color: var(--dark-card-background);
+  border-color: var(--dark-header-background);
+  color: #e2e8f0;
+}
 
 /* Adjustments for the add to cart button label when quantity is shown */
 .label:has(.input:checked) {
@@ -1000,7 +1280,16 @@ button:active {
   color: var(--light-text-color);
 }
 
-
+/* Dark mode placeholders */
+body.dark-mode ::-webkit-input-placeholder { /* Chrome, Edge, Safari */
+  color: #a0aec0; /* Lighter placeholder text in dark mode */
+}
+body.dark-mode :-ms-input-placeholder { /* IE 10+ */
+  color: #a0aec0;
+}
+body.dark-mode ::placeholder { /* Firefox, Opera, Safari 10.1+ */
+  color: #a0aec0;
+}
 /* ... (الكود السابق) ... */
 
 .label .title {
@@ -1070,12 +1359,22 @@ body.dark-mode .label .title {
     font-size: 12px;
     font-weight: bold;
 }
-
-.social {
-    display: flex;
-    justify-content: space-between;
+.sizes label {
+  border: 1px solid #ccc;
+  padding: 8px 14px;
+  border-radius: 6px;
+  margin-right: 8px;
+  cursor: pointer;
+  user-select: none;
 }
+.sizes input { display:none; }
+.sizes input:checked + span,
+.sizes input:checked ~ label {
+  background:#000;
+  color:#fff;
+  border-color:#000;
+}
+
+
+
 /* ... باقي الكود ... */
-
-
-
