@@ -61,7 +61,7 @@ header .container { display: flex; justify-content: space-between; align-items: 
     stroke: var(--hover-color);
 }
 
-/* Menu Icon for Mobile - New CSS */
+
 .menu-icon {
     display: none; /* Hide by default on desktop */
     flex-direction: column;
@@ -513,4 +513,5 @@ nav .brand img{
   height:auto;
   border-radius:10px;
 }
+
 
