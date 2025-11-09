@@ -495,3 +495,22 @@ header .container { display: flex; justify-content: space-between; align-items: 
       font-size: 0.7rem;
   }
 }
+nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding: 20px 40px;
+}
+
+nav .brand{
+  display:flex;
+  align-items:center;
+  gap:10px; /* مسافة صغيرة بين الصورة والاسم */
+}
+
+nav .brand img{
+  width:60px;
+  height:auto;
+  border-radius:10px;
+}
+
