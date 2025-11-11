@@ -42,7 +42,6 @@ header .container { display: flex; justify-content: space-between; align-items: 
 .nav-links a { color: var(--light-text-color); text-decoration: none; transition: color 0.3s ease; }
 .nav-links a:hover { color: var(--primary-color); }
 
-/* Cart Button in Header - يمكن إزالة هذا في حال الاعتماد على الزر العائم */
 .cart-btn {
     background: none;
     border: none;
@@ -572,3 +571,4 @@ nav .brand img{
         height: 25px;
     }
 }
+
