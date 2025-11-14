@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Variables ---
-    // تم إزالة cartButton لأنه لا يوجد زر سلة في الهيدر، وتم الاعتماد على الزر العائم
     const floatingCartButton = document.getElementById('floating-cart-button'); 
     const cartModal = document.getElementById('cart-modal');
     const closeModalButton = document.getElementById('close-modal');
@@ -25,13 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let cart = [];
 
     // --- Delivery Constants ---
-    // المناطق ذات التكلفة المنخفضة (القاهرة/الجيزة عادة)
-    const deliveryCostEgyptMadaeen = 25;
-    // باقي المناطق والمحافظات
-    const deliveryCostOtherLocations = 40;
-    // الكلمات المفتاحية للمدن ذات التكلفة المنخفضة (يرجى تعديلها حسب الحاجة)
-    const madaeenKeywords = ['المعادي', 'حدائق المعادي', 'دار السلام', 'دارالسلام', 'حلوان', 'طره', 'البساتين', 'المقطم', 'مدينة نصر', 'التجمع', 'القاهرة', 'الجيزة'];
-
+    const deliveryCostFixed = 60; // تكلفة التوصيل ثابتة لأي مكان
 
     // --- Helper Functions ---
     function getSelectedSize(productCard) {
@@ -48,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return selectedDot ? selectedDot.dataset.color : (productCard.querySelector('.color-dot')?.dataset.color || 'غير محدد');
     }
 
-    // Function to find an item in the cart by its unique combination
     function findCartItemIndex(productId, size, color) {
         return cart.findIndex(item => item.id === productId && item.size === size && item.color === color);
     }
@@ -62,29 +54,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedColor = getSelectedColor(productCard);
         const checkbox = productCard.querySelector('.input.add-to-cart');
 
-        // Check if size is selected only when trying to add (checkbox is checked)
         if (!selectedSize && isChecked) {
             alert("من فضلك اختار المقاس أولاً لإضافة المنتج للسلة.");
-            if (checkbox) checkbox.checked = false; // Uncheck it if no size
+            if (checkbox) checkbox.checked = false;
             return;
         }
 
         const existingItemIndex = findCartItemIndex(productId, selectedSize, selectedColor);
 
-        if (isChecked && selectedSize) { // Only proceed if checked AND size is selected
+        if (isChecked && selectedSize) {
             if (existingItemIndex > -1) {
-                // Item exists, update its quantity (in case quantity buttons were used before checking the box)
                 cart[existingItemIndex].quantity = quantity;
             } else {
-                // New item
                 cart.push({ id: productId, name: productName, price: productPrice, quantity: quantity, size: selectedSize, color: selectedColor });
             }
         } else if (!isChecked) {
-            // Checkbox was unchecked, remove item from cart
             if (existingItemIndex > -1) removeItemFromCart(productId, selectedSize, selectedColor, false);
         } else if (isChecked && !selectedSize) {
-             // Already handled with alert, but ensuring checkbox is unchecked
-             if (checkbox) checkbox.checked = false;
+            if (checkbox) checkbox.checked = false;
         }
 
         updateCartDisplay();
@@ -104,16 +91,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const selectedColor = getSelectedColor(productCard);
             const checkbox = productCard.querySelector('.input.add-to-cart');
 
-            // If item is already checked, update cart quantity
             if (checkbox.checked && selectedSize) {
                 const itemIndex = findCartItemIndex(productId, selectedSize, selectedColor);
                 if (itemIndex > -1) {
                     cart[itemIndex].quantity = newQuantity;
                     updateCartDisplay();
                 } else {
-                    // This case should ideally not happen if logic is tight, but if it does, add it.
-                    const productName = card.querySelector('.product-title').textContent;
-                    const productPriceText = card.querySelector('.product-price').textContent.replace(/[^0-9.]+/g, "").trim();
+                    const productName = productCard.querySelector('.product-title').textContent;
+                    const productPriceText = productCard.querySelector('.product-price').textContent.replace(/[^0-9.]+/g, "").trim();
                     const productPrice = parseFloat(productPriceText);
                     addToCart(productId, productName, productPrice, true);
                 }
@@ -127,12 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (updateCheckbox) {
             const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
             if (productCard) {
-                // Note: This only works correctly if the *removed* item is the *currently selected* size/color combination on the card.
-                // Since the cart item is uniquely defined by ID, Size, and Color, this is a simplification.
-                // For full correctness, one might need a more complex way to "uncheck" only the relevant card if multiple same-ID items were possible.
-                // Given the current UX (one checkbox per card), we uncheck the card if it was the last variant added.
                 const allVariantsRemoved = cart.filter(item => item.id === productId).length === 0;
-                
                 if (allVariantsRemoved) {
                     const checkbox = productCard.querySelector('.input.add-to-cart');
                     if (checkbox) checkbox.checked = false;
@@ -194,16 +174,10 @@ document.addEventListener('DOMContentLoaded', () => {
            totalOrderPrice += item.price * item.quantity;
         });
 
-        const lowerCaseAddress = inputAddress.value.trim().toLowerCase();
-        const isMadaeenArea = madaeenKeywords.some(keyword => lowerCaseAddress.includes(keyword));
-
-        const currentDeliveryCost = isMadaeenArea ? deliveryCostEgyptMadaeen : deliveryCostOtherLocations;
+        // ✅ التوصيل ثابت لأي مكان
+        const currentDeliveryCost = deliveryCostFixed;
         const finalTotalPrice = totalOrderPrice + currentDeliveryCost;
-        
-        const deliveryAreaInfo = isMadaeenArea 
-            ? `(المناطق المحددة: ${deliveryCostEgyptMadaeen} ج.م)` 
-            : `(باقي المناطق: ${deliveryCostOtherLocations} ج.م)`;
-
+        const deliveryAreaInfo = `(سعر التوصيل ثابت: ${deliveryCostFixed} ج.م)`;
 
         const whatsappMessage = `
 *--- تفاصيل طلب جديد - CODE FASHION ---*
@@ -223,12 +197,11 @@ ${orderDetailsString}
         `;
 
         const encodedMessage = encodeURIComponent(whatsappMessage);
-        const phoneNumber = '201017925907'; // رقم الواتساب الخاص بك
+        const phoneNumber = '201017925907';
         const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
         
         window.open(whatsappLink, '_blank');
         
-        // Clear cart and close modal after sending
         cart = [];
         updateCartDisplay(); 
         closeCartModal();
@@ -242,7 +215,6 @@ ${orderDetailsString}
         if (cart.length === 0) {
             cartItemsList.innerHTML = `<li style="text-align: center; color: var(--light-text-color);">عربة التسوق فارغة.</li>`;
             cartTotalPrice.textContent = `0.00 ج.م`;
-            // Hide payment button if cart is empty
             if(paymentTriggerBtn) paymentTriggerBtn.style.display = 'none';
         } else {
             if(paymentTriggerBtn) paymentTriggerBtn.style.display = 'block';
@@ -276,12 +248,10 @@ ${orderDetailsString}
         }
     }
 
-    // --- Event Listeners ---
     if (floatingCartButton) floatingCartButton.addEventListener('click', (e) => { e.preventDefault(); openCartModal(); });
     if (closeModalButton) closeModalButton.addEventListener('click', closeCartModal);
     if (cartModal) window.addEventListener('click', (event) => { if (event.target === cartModal) closeCartModal(); });
 
-    // Product Card Handlers
     document.querySelectorAll('.product-card').forEach(card => {
         const productId = card.dataset.id;
         const addToCartCheckbox = card.querySelector('.input.add-to-cart'); 
@@ -291,33 +261,25 @@ ${orderDetailsString}
         const colorDots = card.querySelectorAll('.color-dot');
         const sizeRadios = card.querySelectorAll('.sizes input[type="radio"]');
 
-        // 1. Initial color selection: Select the first color by default
         if (colorDots.length > 0 && !card.querySelector('.color-dot.selected')) {
             colorDots[0].classList.add('selected'); 
         }
 
-        // 2. Color dot click listener:
         colorDots.forEach(dot => {
             dot.addEventListener('click', () => {
                 const img = dot.getAttribute('data-image');
                 productImg.src = img;
-
-                // تمييز اللون المختار
                 colorDots.forEach(d => d.classList.remove('selected'));
                 dot.classList.add('selected');
-
-                // إذا كان المنتج في السلة، قم بتحديثه
                 if (addToCartCheckbox.checked) {
                     const productName = card.querySelector('.product-title').textContent;
                     const productPriceText = card.querySelector('.product-price').textContent.replace(/[^0-9.]+/g, "").trim();
                     const productPrice = parseFloat(productPriceText);
-                    // Add/update to cart with the new color
                     addToCart(productId, productName, productPrice, true);
                 }
             });
         });
 
-        // 3. Add to Cart Checkbox listener
         if (addToCartCheckbox) {
             addToCartCheckbox.addEventListener('change', (e) => {
                 const isChecked = e.target.checked;
@@ -332,26 +294,21 @@ ${orderDetailsString}
             });
         }
         
-        // 4. Quantity Buttons listener
         if (minusBtn) minusBtn.addEventListener('click', () => updateQuantity(productId, -1));
         if (plusBtn) plusBtn.addEventListener('click', () => updateQuantity(productId, 1));
 
-        // 5. Size Radio Buttons listener
         sizeRadios.forEach(radio => {
             radio.addEventListener('change', () => {
-                // إذا كان المنتج مختاراً (الزر محدد)، قم بتحديث بياناته في السلة
                 if (addToCartCheckbox.checked) {
                     const productName = card.querySelector('.product-title').textContent;
                     const productPriceText = card.querySelector('.product-price').textContent.replace(/[^0-9.]+/g, "").trim();
                     const productPrice = parseFloat(productPriceText);
-                    // Add/update to cart with the new size
                     addToCart(productId, productName, productPrice, true);
                 }
             });
         });
     });
 
-    // Cart Modal Remove Button listener
     cartItemsList.addEventListener('click', (e) => {
         if (e.target.classList.contains('remove-item-btn')) {
             const productIdToRemove = e.target.dataset.id;
@@ -364,14 +321,11 @@ ${orderDetailsString}
     if (paymentTriggerBtn) paymentTriggerBtn.addEventListener('click', showDeliveryForm);
     if (finalCheckoutBtn) finalCheckoutBtn.addEventListener('click', sendOrderViaWhatsApp);
 
-
-    // Mobile menu toggle logic
     if (menuIcon && navLinks) {
         menuIcon.addEventListener('click', () => {
             navLinks.classList.toggle('active');
             menuIcon.classList.toggle('active');
         });
-        // Close menu when a link is clicked
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 setTimeout(() => {
